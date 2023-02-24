@@ -1,4 +1,7 @@
 import requests
+import logging
+
+logging.basicConfig(level = logging.INFO, filename="py_log.log", filemode='w', format="%(asctime)s %(levelname)s %(message)s")
 
 class YaUploader:
     def __init__(self, token):
@@ -15,15 +18,12 @@ class YaUploader:
         headers = self.get_headers()
         params = {"path": "vk_photos"}
         requests.put(url, headers=headers, params=params)
+        logging.info('Папка для фотографий "vk_photos" создана')
 
-    def _get_upload_link(self, file_path):
+    def upload(self, file_path, url):
         upload_url = 'https://cloud-api.yandex.net/v1/disk/resources/upload'
         headers = self.get_headers()
-        params = {"path": file_path, "overwrite": "true"}
-        response = requests.get(upload_url, headers=headers, params=params)
-        return response.json()
-
-    def upload(self, file_path, filename):
-        href = self._get_upload_link(file_path=file_path).get("href")
-        requests.put(href, data=open(filename, 'rb'))
+        params = {'path':file_path, 'url':url, 'disable_redirects':True}
+        requests.post(upload_url, headers=headers, params=params)
+        
         
